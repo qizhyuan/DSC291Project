@@ -13,8 +13,8 @@ class DArec(nn.Module):
         self.n_items = args.n_items
         self.S_n_users = args.S_n_users
         self.T_n_users = args.T_n_users
-        self.S_autorec = I_AutoRec(self.n_items, self.S_n_users, self.n_factors)
-        self.T_autorec = I_AutoRec(self.n_items, self.T_n_users, self.n_factors)
+        self.S_autorec = I_AutoRec(self.S_n_users, self.n_items, self.n_factors)
+        self.T_autorec = I_AutoRec(self.T_n_users, self.n_items, self.n_factors)
         # 加载预训练
         self.S_autorec.load_state_dict(torch.load(args.S_pretrained_weights))
         self.T_autorec.load_state_dict(torch.load(args.T_pretrained_weights))
