@@ -16,14 +16,14 @@ Since our task is to predict the interactions, we can simply ignore the rating d
 
 ## Dataset Statistics
 ### Target Domain:  
-Train:
+Train:  
 User Num: 10660  
 Item Num: 3589  
 Rating Num: 19334  
 Average User Degree: 1.81  
 Average Item Degree: 5.38  
 
-Test:
+Test:  
 Num: 5019  
   
 ### Source Domain:  
@@ -70,7 +70,7 @@ hit@5 : 0.10958358238692967
 hit@10 : 0.21797170751145648  
 hit@15 : 0.3189878461844989  
 
-5. Cosine-similarity model: 
+5. Cosine-similarity model:  
 hit@1 : 0.07352062163777645  
 hit@5 : 0.1528192867105001  
 hit@10 : 0.19884439131301057  
@@ -114,7 +114,7 @@ hit@5 : 0.28662882787750793
 hit@10 : 0.5560982048574445  
 hit@15 : 0.7292106652587117  
 
-5. Cosine-similarity model: 
+5. Cosine-similarity model:  
 hit@1 : 0.0
 hit@5 : 0.0
 hit@10 : 0.0
