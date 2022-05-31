@@ -212,7 +212,7 @@ if __name__ == '__main__':
     target_model_baseline = SourceModel(user_num, item_num, emb_dim).to(device)
     optimizer_base = torch.optim.Adam(target_model_baseline.parameters(), lr=learning_rate, weight_decay=weight_decay)
     train_source_model(target_model_baseline, data_train_target, data_eval_target, items_per_user_s, source_item_list, criterion,
-                       optimizer_base, device, 10,
+                       optimizer_base, device, 15,
                        batch_size_s, './target_model_baseline.pkl')
 
 
@@ -222,7 +222,7 @@ if __name__ == '__main__':
     optimizer_s = torch.optim.Adam(source_model.parameters(), lr=learning_rate, weight_decay=weight_decay)
     pretrain_path = './source_model.pkl'
     train_source_model(source_model, data_train_source, data_eval_source, items_per_user_s, source_item_list, criterion,
-                       optimizer_s, device, 10,
+                       optimizer_s, device, 15,
                        batch_size_s, pretrain_path)
 
     # train target-domain model
@@ -236,4 +236,4 @@ if __name__ == '__main__':
 
     target_item_list = list(target_item_set)
     train_target_model(target_model, data_train_target, data_eval_target, items_per_user_t, target_item_list, criterion,
-                       optimizer_t, device, 10, batch_size_t, save_path)
+                       optimizer_t, device, 15, batch_size_t, save_path)
