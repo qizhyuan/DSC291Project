@@ -17,21 +17,21 @@ Since our task is to predict the interactions, we can simply ignore the rating d
 ## Dataset Statistics
 ### Target Domain:  
 Train:
-User Num: 16746  
-Item Num: 4230  
-Rating Num: 103571  
-Average User Degree: 6.18  
-Average Item Degree: 24.48
+User Num: 10660  
+Item Num: 3589  
+Rating Num: 19334  
+Average User Degree: 1.81
+Average Item Degree: 5.38
 
 Test:
-Num: 14510
+Num: 5019
   
 ### Source Domain:  
-User Num: 13149  
-Item Num: 4230  
-Rating Num: 737512  
-Average User Degree: 56.08  
-Average Item Degree: 174.35  
+User Num: 18305  
+Item Num: 3589  
+Rating Num: 767582  
+Average User Degree: 41.93  
+Average Item Degree: 213.87 
 
 ## Experimental Result
 1. MF model on target domain:  
