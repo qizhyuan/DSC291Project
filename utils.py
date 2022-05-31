@@ -26,8 +26,12 @@ def load_data(path, user_idx_dict=None, item_idx_dict=None):
             item_idx_dict[recipe] = len(item_idx_dict)
         uid = user_idx_dict[user]
         gid = item_idx_dict[recipe]
-        if 'label' in d:
-            label = float(d['label'])
+        if 'rating' in d:
+            label = float(d['rating'])
+            if label > 0:
+                label = 1.
+            else:
+                label = 0.
             data.append((uid, gid, label))
         else:
             data.append((uid, gid, 1.0))
@@ -86,7 +90,7 @@ def negative_sampling_helper(input_q: mp.Queue, out_put_q: mp.Queue, items_per_u
 from collections import defaultdict
 
 
-def compute_hit_ratio(model, test_data, k_list=None):
+def compute_hit_ratio_old(model, test_data, k_list=None):
     if k_list is None:
         k_list = [1]
     model.eval()
@@ -129,3 +133,42 @@ def compute_hit_ratio(model, test_data, k_list=None):
         else:
             hits_result[k] = sum(v) / len(v)
     return hits_result
+
+
+import math
+
+
+def compute_hit_ndcg(model, test_data, k_list=None):
+    if k_list is None:
+        k_list = [1]
+    model.eval()
+    k_list.sort()
+    device = next(model.parameters()).device
+    hits_result = {k: 0 for k in k_list}
+    ndcg_result = {k: 0 for k in k_list}
+    test_num = len(test_data)
+    # test_data:[[user_id, [positive items], [negative items]]]
+    for uid, pos, neg in test_data:
+        pos_num = len(pos)
+        gids = pos + neg
+        gid_num = len(gids)
+        gid_tensor = torch.tensor(gids).to(device).long()
+        uid_tensor = torch.tensor([uid for _ in range(gid_num)]).to(device).long()
+        out = model(uid_tensor, gid_tensor).squeeze()
+        indices = torch.argsort(out, descending=True)
+        hits_counter = {k: 0 for k in k_list}
+        ndcg_counter = {k: 0 for k in k_list}
+        for i in range(k_list[-1]):
+            idx = indices[i].item()
+            if idx < pos_num:
+                for k in k_list:
+                    if i < k:
+                        hits_counter[k] += 1
+                        ndcg_counter[k] += 1 / math.log2(i + 2)
+        for k in k_list:
+            hits_result[k] += hits_counter[k] / pos_num
+            ndcg_result[k] += ndcg_counter[k] / pos_num
+    for k in hits_result:
+        hits_result[k] /= test_num
+        ndcg_result[k] /= test_num
+    return hits_result, ndcg_result
