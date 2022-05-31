@@ -34,7 +34,7 @@ Average User Degree: 56.08
 Average Item Degree: 174.35  
 
 ## Experimental Result
-1. MF model on target domain: 
+1. MF model on target domain:  
 ----------Hits@K----------  
 Hits@1: 0.26340454858718126  
 Hits@5: 0.6096485182632667  
