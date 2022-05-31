@@ -156,7 +156,7 @@ def get_batch_data(data, batch_size):
 if __name__ == '__main__':
     random.seed(2022)
     # source-domain data
-    source_path = "./data_source.csv"
+    source_path = "./dataset/data_source.csv"
     source_data, source_user_idx_dict, source_item_idx_dict = load_data(source_path)
     data_train_source, data_eval_source = train_eval_split(source_data, 0.98)
 
@@ -167,12 +167,12 @@ if __name__ == '__main__':
     source_item_list = [i for i in range(item_num_source)]
 
     # target-domain data
-    target_path = "./data_target.csv"
+    target_path = "./dataset/data_target.csv"
     target_data, user_idx_dict, item_idx_dict = load_data(target_path, source_user_idx_dict, source_item_idx_dict)
     data_train_target, _ = train_eval_split(target_data, 1.0)
 
     # target-domain test data
-    test_path = "./data_test.csv"
+    test_path = "./dataset/data_test.csv"
     data_test, _, _ = load_data(test_path, user_idx_dict, item_idx_dict)
 
     user_num = len(user_idx_dict)
