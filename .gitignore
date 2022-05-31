@@ -130,7 +130,6 @@ dmypy.json
 *.pkl
 *.gz
 .idea
-*.rar
 *.scv
 .zip
 *.csv
