@@ -20,11 +20,11 @@ Train:
 User Num: 10660  
 Item Num: 3589  
 Rating Num: 19334  
-Average User Degree: 1.81
-Average Item Degree: 5.38
+Average User Degree: 1.81  
+Average Item Degree: 5.38  
 
 Test:
-Num: 5019
+Num: 5019  
   
 ### Source Domain:  
 User Num: 18305  
