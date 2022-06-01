@@ -13,8 +13,8 @@ from util import downsampling
 
 parser = argparse.ArgumentParser(description='DArec with PyTorch')
 parser.add_argument('--epochs', '-e', type=int, default=50)
-parser.add_argument('--batch_size', '-b', type=int, default=8)
-parser.add_argument('--lr', '-l', type=float, help='learning rate', default=1e-4)
+parser.add_argument('--batch_size', '-b', type=int, default=32)
+parser.add_argument('--lr', '-l', type=float, help='learning rate', default=1e-3)
 parser.add_argument('--wd', '-w', type=float, help='weight decay(lambda)', default=1e-5)
 parser.add_argument("--n_factors", type=int, default=200, help="embedding dim")
 parser.add_argument("--n_items", type=int, default=3589, help="number of items")
@@ -74,13 +74,13 @@ def train(epoch):
             Total_MASK += torch.sum(target_mask).item()
 
             loss = source_loss
+            predictions.extend(target_prediction.cpu().detach().numpy())
         is_source = False
         if not is_source:
             class_output, source_prediction, target_prediction = net(target_rating, alpha, is_source)
             target_loss, source_mask, target_mask = criterion(class_output, source_prediction, target_prediction,
                                                               source_rating, target_rating, target_labels)
             loss += target_loss
-            predictions.extend(target_prediction.cpu().detach().numpy())
 
         loss.backward()
         optimizer.step()
@@ -184,7 +184,8 @@ if __name__ == "__main__":
         val_ndcg5.append(ndcg5)
         val_ndcg10.append(ndcg10)
         val_ndcg15.append(ndcg15)
-        if ndcg15 > best_metric:
+        if hits15 > best_metric:
+            best_metric = hits15
             torch.save(net.state_dict(), wdir + "best_model.pkl")
         print("==================================")
         print("Validation hits1:", hits1)

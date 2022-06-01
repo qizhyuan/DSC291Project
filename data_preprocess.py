@@ -11,16 +11,14 @@ target["label"] = 1
 test["label"] = 1
 
 target_val = target.iloc[-370:, :]
-target = target.iloc[:-370, :]
 target_val.reset_index(drop=True, inplace=True)
 target.reset_index(drop=True, inplace=True)
 print(target_val.shape)
-print(target.shape)
 
-source.to_csv("dataset/data_source_processed.csv")
-target.to_csv("dataset/data_target_processed.csv")
-target_val.to_csv("dataset/data_target_val_processed.csv")
-test.to_csv("dataset/data_test_processed.csv")
+source.to_csv("dataset/data_source_processed.csv", index=False)
+target.to_csv("dataset/data_target_processed.csv", index=False)
+target_val.to_csv("dataset/data_target_val_processed.csv", index=False)
+test.to_csv("dataset/data_test_processed.csv", index=False)
 
 source_rating_matrix = np.load("dataset/data_source.csv.npy")
 target_rating_matrix = np.load("dataset/data_target.csv.npy")

@@ -13,6 +13,8 @@ ndcg5 = np.load("log/val_ndcg5.npy")
 ndcg10 = np.load("log/val_ndcg10.npy")
 ndcg15 = np.load("log/val_ndcg15.npy")
 
+print(loss)
+
 plt.plot(range(1, 51), hits1, label="hits1")
 plt.plot(range(1, 51), hits5, label="hits5")
 plt.plot(range(1, 51), hits10, label="hits10")
@@ -24,6 +26,8 @@ plt.plot(range(1, 51), ndcg15, label="NDCG15")
 plt.legend()
 plt.show()
 
+plt.plot(range(1, 51), loss)
+plt.show()
 
 
 
