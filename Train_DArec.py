@@ -16,11 +16,11 @@ parser.add_argument('--epochs', '-e', type=int, default=50)
 parser.add_argument('--batch_size', '-b', type=int, default=32)
 parser.add_argument('--lr', '-l', type=float, help='learning rate', default=1e-3)
 parser.add_argument('--wd', '-w', type=float, help='weight decay(lambda)', default=1e-5)
-parser.add_argument("--n_factors", type=int, default=200, help="embedding dim")
+parser.add_argument("--n_factors", type=int, default=2000, help="embedding dim")
 parser.add_argument("--n_items", type=int, default=3589, help="number of items")
 parser.add_argument("--S_n_users", type=int, default=18305, help="Source users number")
 parser.add_argument("--T_n_users", type=int, default=10660, help="Target users number")
-parser.add_argument("--RPE_hidden_size", type=int, default=200, help="hidden size of Rating Pattern Extractor")
+parser.add_argument("--RPE_hidden_size", type=int, default=2000, help="hidden size of Rating Pattern Extractor")
 parser.add_argument("--S_pretrained_weights", type=str, default=r'pretrain\S_AutoRec.pkl')
 parser.add_argument("--T_pretrained_weights", type=str, default=r'pretrain\T_AutoRec.pkl')
 args = parser.parse_args()
@@ -102,10 +102,10 @@ def val(predictions):
     for user, user_items in tqdm(user_interactions):
         user_pred = [float(pred[user]) for pred in predictions]
         item_scores = np.array(user_pred)[user_items]
-        item_ranking = np.argsort(item_scores) + 1
+        item_ranking = np.argsort(item_scores)
         item_ranking = item_ranking[::-1]
         # The target item is the first item
-        target_ranking = item_ranking[0]
+        target_ranking = item_ranking.tolist().index(0) + 1
         if target_ranking <= 15:
             hits15 += 1
             ndcg15 += (1 / np.log2(target_ranking+1))
@@ -138,10 +138,10 @@ def test(predictions):
     for user, user_items in tqdm(user_interactions):
         user_pred = [float(pred[user]) for pred in predictions]
         item_scores = np.array(user_pred)[user_items]
-        item_ranking = np.argsort(item_scores) + 1
+        item_ranking = np.argsort(item_scores)
         item_ranking = item_ranking[::-1]
         # The target item is the first item
-        target_ranking = item_ranking[0]
+        target_ranking = item_ranking.tolist().index(0) + 1
         if target_ranking <= 15:
             hits15 += 1
             ndcg15 += (1 / np.log2(target_ranking + 1))
