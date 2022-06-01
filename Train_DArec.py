@@ -9,61 +9,48 @@ import argparse
 from tqdm import tqdm
 import math
 import json
-from sklearn.metrics import accuracy_score
+from util import downsampling
 
 parser = argparse.ArgumentParser(description='DArec with PyTorch')
-parser.add_argument('--epochs', '-e', type=int, default=20)
-parser.add_argument('--batch_size', '-b', type=int, default=64)
-parser.add_argument('--lr', '-l', type=float, help='learning rate', default=1e-3)
+parser.add_argument('--epochs', '-e', type=int, default=50)
+parser.add_argument('--batch_size', '-b', type=int, default=8)
+parser.add_argument('--lr', '-l', type=float, help='learning rate', default=1e-4)
 parser.add_argument('--wd', '-w', type=float, help='weight decay(lambda)', default=1e-5)
 parser.add_argument("--n_factors", type=int, default=200, help="embedding dim")
-parser.add_argument("--n_items", type=int, default=17241, help="size of each batch")
-parser.add_argument("--S_n_users", type=int, default=24260, help="Source items number")
-parser.add_argument("--T_n_users", type=int, default=72957, help="Target items number")
+parser.add_argument("--n_items", type=int, default=3589, help="number of items")
+parser.add_argument("--S_n_users", type=int, default=18305, help="Source users number")
+parser.add_argument("--T_n_users", type=int, default=10660, help="Target users number")
 parser.add_argument("--RPE_hidden_size", type=int, default=200, help="hidden size of Rating Pattern Extractor")
 parser.add_argument("--S_pretrained_weights", type=str, default=r'pretrain\S_AutoRec.pkl')
 parser.add_argument("--T_pretrained_weights", type=str, default=r'pretrain\T_AutoRec.pkl')
 args = parser.parse_args()
 
 # Load Data
-train_dataset = Mydata(r'dataset\data_source.csv', r'dataset\data_target.csv', r'dataset\data_test.csv',
-                       train=True, preprocessed=True)
-val_dataset = Mydata(r'dataset\data_source.csv', r'dataset\data_target.csv', r'dataset\data_test.csv',
-                     train=False, preprocessed=True)
-total_dataset = Mydata(r'dataset\data_source.csv', r'dataset\data_target.csv', r'dataset\data_test.csv',
-                       train_ratio=1, val_ratio=0, train=True, preprocessed=True)
+dataset = Mydata(r'dataset\data_source.csv', r'dataset\data_target.csv', r'dataset\data_test.csv', preprocessed=True)
 
-train_loader = DataLoader(train_dataset, batch_size=args.batch_size, shuffle=True)
-val_loader = DataLoader(val_dataset, batch_size=args.batch_size, shuffle=False)
-total_loader = DataLoader(total_dataset, batch_size=1, shuffle=False)
+dataloader = DataLoader(dataset, batch_size=args.batch_size, shuffle=False)
 
-val_df = pd.read_csv("dataset/data_target.csv.processed.csv")
-val_df = val_df.iloc[val_dataset.val_indices, :]
-val_df.reset_index(drop=True, inplace=True)
-test_df = pd.read_csv("dataset/data_test.csv.processed.csv")
-
+val_df = pd.read_csv("dataset/data_target_val_processed.csv")
+test_df = pd.read_csv("dataset/data_test_processed.csv")
 
 print("Data is loaded")
 # neural network
 net = DArec(args)
-net.S_autorec.load_state_dict(torch.load(args.S_pretrained_weights))
-net.T_autorec.load_state_dict(torch.load(args.T_pretrained_weights))
 net.cuda()
 
 optimizer = optim.Adam(filter(lambda p: p.requires_grad, net.parameters()), weight_decay=args.wd, lr=args.lr)
 RMSE = MRMSELoss().cuda()
 criterion = DArec_Loss().cuda()
 
-
 # loss, source_mask, target_mask
 def train(epoch):
-    # process = []
     Total_RMSE = 0
     Total_MASK = 0
     print("Epoch", epoch+1)
-    for idx, d in enumerate(tqdm(train_loader)):
+    predictions = []
+    for idx, d in enumerate(tqdm(dataloader)):
         # alpha referring DDAN
-        p = float(idx + epoch * len(train_loader)) / args.batch_size / len(train_loader)
+        p = float(idx + epoch * len(dataloader)) / args.batch_size / len(dataloader)
         alpha = 2. / (1. + np.exp(-10 * p)) - 1
 
         # data
@@ -93,134 +80,146 @@ def train(epoch):
             target_loss, source_mask, target_mask = criterion(class_output, source_prediction, target_prediction,
                                                               source_rating, target_rating, target_labels)
             loss += target_loss
+            predictions.extend(target_prediction.cpu().detach().numpy())
 
         loss.backward()
         optimizer.step()
 
-    return math.sqrt(Total_RMSE / Total_MASK)
+    return math.sqrt(Total_RMSE / Total_MASK), predictions
 
 
-def val():
-    Total_RMSE = 0
-    Total_MASK = 0
-    with torch.no_grad():
-        for idx, d in enumerate(tqdm(val_loader)):
-            # alpha referring DDAN
-            p = float(idx + epoch * len(train_loader)) / args.batch_size / len(train_loader)
-            alpha = 2. / (1. + np.exp(-10 * p)) - 1
-            # data
-            source_rating, target_rating, source_labels, target_labels = d
+def val(predictions):
+    hits1 = 0
+    hits5 = 0
+    hits10 = 0
+    hits15 = 0
+    ndcg1 = 0
+    ndcg5 = 0
+    ndcg10 = 0
+    ndcg15 = 0
+    user_interactions = downsampling(val_df, dataset.T_data)
+    n_users = len(user_interactions)
+    for user, user_items in tqdm(user_interactions):
+        user_pred = [float(pred[user]) for pred in predictions]
+        item_scores = np.array(user_pred)[user_items]
+        item_ranking = np.argsort(item_scores) + 1
+        item_ranking = item_ranking[::-1]
+        # The target item is the first item
+        target_ranking = item_ranking[0]
+        if target_ranking <= 15:
+            hits15 += 1
+            ndcg15 += (1 / np.log2(target_ranking+1))
+        if target_ranking <= 10:
+            hits10 += 1
+            ndcg10 += (1 / np.log2(target_ranking+1))
+        if target_ranking <= 5:
+            hits5 += 1
+            ndcg5 += (1 / np.log2(target_ranking+1))
+        if target_ranking <= 1:
+            hits1 += 1
+            ndcg1 += (1 / np.log2(target_ranking+1))
 
-            source_rating = source_rating.cuda()
-            target_rating = target_rating.cuda()
-            source_labels = source_labels.squeeze(1).long().cuda()
-
-            is_source = True
-            if is_source:
-                class_output, source_prediction, target_prediction = net(source_rating, alpha, is_source)
-                source_loss, source_mask, target_mask = criterion(class_output, source_prediction, target_prediction,
-                                                                  source_rating, target_rating, source_labels)
-                rmse, _ = RMSE(target_prediction, target_rating)
-                Total_RMSE += rmse.item()
-                Total_MASK += torch.sum(target_mask).item()
-        predictions = []
-        for idx, d in enumerate(tqdm(total_loader)):
-            # data
-            source_rating, target_rating, source_labels, target_labels = d
-
-            source_rating = source_rating.cuda()
-
-            is_source = True
-            if is_source:
-                class_output, source_prediction, target_prediction = net(source_rating, alpha, is_source)
-                target_prediction = target_prediction.squeeze(0).cpu().numpy()
-                target_prediction[target_prediction <= 0.5] = 0
-                target_prediction[target_prediction > 0.5] = 1
-                predictions.append(target_prediction)
-        pred_interactions = []
-        labels = []
-        for index, row in enumerate(val_df.iterrows()):
-            row = row[1]
-            user_idx, item_idx, label = row["user"], row["item"], row["label"]
-            labels.append(label)
-            pred_interactions.append(predictions[item_idx][user_idx])
-        val_acc = accuracy_score(np.array(pred_interactions), np.array(labels))
-
-    return math.sqrt(Total_RMSE / Total_MASK), val_acc
+    return (hits1/n_users, hits5/n_users, hits10/n_users, hits15/n_users,
+            ndcg1/n_users, ndcg5/n_users, ndcg10/n_users, ndcg15/n_users)
 
 
-def test():
+def test(predictions):
     net.load_state_dict(torch.load(r"weights/best_model.pkl"))
-    Total_RMSE = 0
-    Total_MASK = 0
-    with torch.no_grad():
-        predictions = []
-        for idx, d in enumerate(tqdm(total_loader)):
-            # alpha referring DDAN
-            p = float(idx + epoch * len(train_loader)) / args.batch_size / len(train_loader)
-            alpha = 2. / (1. + np.exp(-10 * p)) - 1
-            # data
-            source_rating, target_rating, source_labels, target_labels = d
+    hits1 = 0
+    hits5 = 0
+    hits10 = 0
+    hits15 = 0
+    ndcg1 = 0
+    ndcg5 = 0
+    ndcg10 = 0
+    ndcg15 = 0
+    user_interactions = downsampling(test_df, dataset.T_data)
+    n_users = len(user_interactions)
+    for user, user_items in tqdm(user_interactions):
+        user_pred = [float(pred[user]) for pred in predictions]
+        item_scores = np.array(user_pred)[user_items]
+        item_ranking = np.argsort(item_scores) + 1
+        item_ranking = item_ranking[::-1]
+        # The target item is the first item
+        target_ranking = item_ranking[0]
+        if target_ranking <= 15:
+            hits15 += 1
+            ndcg15 += (1 / np.log2(target_ranking + 1))
+        if target_ranking <= 10:
+            hits10 += 1
+            ndcg10 += (1 / np.log2(target_ranking + 1))
+        if target_ranking <= 5:
+            hits5 += 1
+            ndcg5 += (1 / np.log2(target_ranking + 1))
+        if target_ranking <= 1:
+            hits1 += 1
+            ndcg1 += (1 / np.log2(target_ranking + 1))
 
-            source_rating = source_rating.cuda()
-            target_rating = target_rating.cuda()
-            source_labels = source_labels.squeeze(1).long().cuda()
-
-            is_source = True
-            if is_source:
-                class_output, source_prediction, target_prediction = net(source_rating, alpha, is_source)
-                source_loss, source_mask, target_mask = criterion(class_output, source_prediction, target_prediction,
-                                                                  source_rating, target_rating, source_labels)
-                rmse, _ = RMSE(target_prediction, target_rating)
-                Total_RMSE += rmse.item()
-                Total_MASK += torch.sum(target_mask).item()
-                target_prediction = target_prediction.squeeze(0).cpu().numpy()
-                target_prediction[target_prediction <= 0.5] = 0
-                target_prediction[target_prediction > 0.5] = 1
-                predictions.append(target_prediction)
-        pred_interactions = []
-        labels = []
-        for index, row in enumerate(test_df.iterrows()):
-            row = row[1]
-            user_idx, item_idx, label = row["user"], row["item"], row["label"]
-            labels.append(label)
-            pred_interactions.append(predictions[item_idx][user_idx])
-        test_acc = accuracy_score(np.array(pred_interactions), np.array(labels))
-
-    return math.sqrt(Total_RMSE / Total_MASK), test_acc
+    return (hits1 / n_users, hits5 / n_users, hits10 / n_users, hits15 / n_users,
+            ndcg1 / n_users, ndcg5 / n_users, ndcg10 / n_users, ndcg15 / n_users)
 
 
 if __name__ == "__main__":
     train_rmses = []
-    val_rmses = []
-    val_accs = []
+    val_hits1 = []
+    val_hits5 = []
+    val_hits10 = []
+    val_hits15 = []
+    val_ndcg1 = []
+    val_ndcg5 = []
+    val_ndcg10 = []
+    val_ndcg15 = []
     wdir = r"weights\\"
-    best_acc = 0
+    best_metric = 0
+    predictions = []
     for epoch in range(args.epochs):
-        train_rmses.append(train(epoch))
-        val_rmse, val_acc = val()
-        val_rmses.append(val_rmse)
-        val_accs.append(val_acc)
-        if val_acc > best_acc:
+        train_loss, predictions = train(epoch)
+        train_rmses.append(train_loss)
+        hits1, hits5, hits10, hits15, ndcg1, ndcg5, ndcg10, ndcg15 = val(predictions)
+        val_hits1.append(hits1)
+        val_hits5.append(hits5)
+        val_hits10.append(hits10)
+        val_hits15.append(hits15)
+        val_ndcg1.append(ndcg1)
+        val_ndcg5.append(ndcg5)
+        val_ndcg10.append(ndcg10)
+        val_ndcg15.append(ndcg15)
+        if ndcg15 > best_metric:
             torch.save(net.state_dict(), wdir + "best_model.pkl")
-        print("Validation loss:", val_rmse)
-        print("Validation Accuracy", val_acc)
+        print("==================================")
+        print("Validation hits1:", hits1)
+        print("Validation hits5", hits5)
+        print("Validation hits10", hits10)
+        print("Validation hits15", hits15)
+        print("Validation ndcg1", ndcg1)
+        print("Validation ndcg5", ndcg5)
+        print("Validation ndcg10", ndcg10)
+        print("Validation ndcg15", ndcg15)
 
-    test_loss, test_acc = test()
+    hits1, hits5, hits10, hits15, ndcg1, ndcg5, ndcg10, ndcg15 = test(predictions)
 
     np.save(r"log\train_rmse", np.array(train_rmses))
-    np.save(r"log\val_rmse", np.array(val_rmses))
-    np.save(r"log\val_accs", np.array(val_accs))
+    np.save(r"log\val_hits1", np.array(val_hits1))
+    np.save(r"log\val_hits5", np.array(val_hits5))
+    np.save(r"log\val_hits10", np.array(val_hits10))
+    np.save(r"log\val_hits15", np.array(val_hits15))
+    np.save(r"log\val_ndcg1", np.array(val_ndcg1))
+    np.save(r"log\val_ndcg5", np.array(val_ndcg5))
+    np.save(r"log\val_ndcg10", np.array(val_ndcg10))
+    np.save(r"log\val_ndcg15", np.array(val_ndcg15))
 
     test_result = {
-        "test_loss": test_loss,
-        "test_acc": test_acc
+        "test_hits1": hits1,
+        "test_hits5": hits5,
+        "test_hits10": hits10,
+        "test_hits15": hits15,
+        "test_ndcg1": ndcg1,
+        "test_ndcg5": ndcg5,
+        "test_ndcg10": ndcg10,
+        "test_ndcg15": ndcg15,
     }
 
     with open(r"log/test_result.json", "w") as file:
         json.dump(test_result, file)
 
-    print(train_rmses)
-    print(val_rmses)
-    print(val_accs)
-    print(test_loss, test_acc)
+    print(test_result)
