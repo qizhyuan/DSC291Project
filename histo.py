@@ -4,7 +4,7 @@ import numpy as np
 
 # Data comes from training logs or project github repo
 mf = [0.116, 0.459, 0.663, 0.778]
-emcdr = [0.1463, 0.443, 0.598, 0.679]
+emcdr = [0.1597, 0.4779, 0.6265, 0.6915]
 jaccard = [0.0419, 0.3944, 0.6954, 0.833]
 popularity = [0.0487, 0.2866, 0.556, 0.7292]
 sota = [0.021, 0.106, 0.212, 0.319]
