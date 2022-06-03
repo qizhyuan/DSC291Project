@@ -44,6 +44,7 @@ Unzip the file dataset.rar at first. Then, use the following command to perform 
 
     python main.py
 
+The experimental results will be saved in the file result.json in the current dictionary.
 
 ## Experimental Result
 ### MovieLens (S) -> Netflix Prize Data (T)
