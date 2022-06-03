@@ -250,7 +250,7 @@ if __name__ == '__main__':
     learning_rate = 5e-4
     weight_decay = 1e-8
     criterion = torch.nn.BCEWithLogitsLoss()
-    epochs = 1
+    epochs = 15
 
     result_dict = dict()
 
