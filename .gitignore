@@ -136,4 +136,4 @@ dmypy.json
 baselineDSC291.ipynb
 ./dataset
 result.json
-
+.DS_Store
