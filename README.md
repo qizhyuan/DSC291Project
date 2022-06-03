@@ -25,6 +25,13 @@ Average Item Degree: 47.37
 
 Test:  
 Num: 15152    
+  
+### Source Domain:  
+User Num: 1,2481  
+Item Num: 4,799  
+Rating Num: 737,822  
+Average User Degree: 59.11  
+Average Item Degree: 153.74  
 
 ## Setup
 ### Dependencies
@@ -37,14 +44,6 @@ Unzip the file dataset.rar at first. Then, use the following command to perform 
 
     python main.py
 
-
-  
-### Source Domain:  
-User Num: 1,2481  
-Item Num: 4,799  
-Rating Num: 737,822  
-Average User Degree: 59.11  
-Average Item Degree: 153.74  
 
 ## Experimental Result
 ### MovieLens (S) -> Netflix Prize Data (T)
