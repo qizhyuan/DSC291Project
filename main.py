@@ -136,6 +136,7 @@ def train_mixed_model(mixed_model, data_train, data_eval_s, data_eval_t, items_p
             torch.save(mixed_model.state_dict(), save_path)
     return result_dict
 
+
 # negative sampling for training
 def negative_sampling(data, items_per_user, item_list, neg_num=5):
     result = []
