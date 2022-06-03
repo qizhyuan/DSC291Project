@@ -135,4 +135,5 @@ dmypy.json
 *.csv
 baselineDSC291.ipynb
 ./dataset
+result.json
 

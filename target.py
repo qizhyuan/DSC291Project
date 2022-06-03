@@ -11,9 +11,11 @@ class TargetModel(torch.nn.Module):
         self.item_emb = torch.nn.Parameter(torch.nn.init.xavier_normal_(torch.rand((item_num + 1, emb_dim))))
 
         self.layer = torch.nn.Sequential(
-            torch.nn.Linear(self.emb_dim, self.emb_dim),
+            torch.nn.Linear(self.emb_dim, 2 * self.emb_dim),
             torch.nn.ReLU(),
-            torch.nn.Linear(self.emb_dim, self.emb_dim)
+            torch.nn.Linear(2 * self.emb_dim, 2 * self.emb_dim),
+            torch.nn.ReLU(),
+            torch.nn.Linear(2 * self.emb_dim, self.emb_dim)
         )
 
     def forward(self, uids, gids):
