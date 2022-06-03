@@ -58,5 +58,10 @@ The experimental results will be saved in the file result.json in the current di
 |        EMCDR       | 0.1570 | 0.4854 |  0.6463 |  0.7259 |
 
 
+|   Model  | NDCG@1 | NDCG@5 | NDCG@10 | NDCG@15 |
+|:--------:|:------:|:------:|:-------:|:-------:|
+|    MF    | 0.1197 | 0.2932 |  0.3607 |  0.3881 |
+| MF-Mixed | 0.1209 | 0.2793 |  0.3453 |  0.3746 |
+|   EMCDR  | 0.1570 | 0.3253 |  0.3775 |  0.3986 |
 
 
