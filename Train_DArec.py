@@ -25,6 +25,12 @@ parser.add_argument("--S_pretrained_weights", type=str, default=r'pretrain\S_Aut
 parser.add_argument("--T_pretrained_weights", type=str, default=r'pretrain\T_AutoRec.pkl')
 args = parser.parse_args()
 
+source_rating_matrix = np.load(r"dataset/data_source.csv.npy")
+target_rating_matrix = np.load(r"dataset/data_target.csv.npy")
+args.n_items = source_rating_matrix.shape[0]
+args.S_n_users = source_rating_matrix.shape[1]
+args.T_n_users = target_rating_matrix.shape[1]
+
 # Load Data
 dataset = Mydata(r'dataset\data_source.csv', r'dataset\data_target.csv', r'dataset\data_test.csv', preprocessed=True)
 
@@ -44,6 +50,7 @@ criterion = DArec_Loss().cuda()
 
 # loss, source_mask, target_mask
 def train(epoch):
+    net.train()
     Total_RMSE = 0
     Total_MASK = 0
     print("Epoch", epoch+1)
@@ -89,6 +96,7 @@ def train(epoch):
 
 
 def val(predictions):
+    net.eval()
     hits1 = 0
     hits5 = 0
     hits10 = 0
@@ -125,6 +133,7 @@ def val(predictions):
 
 def test(predictions):
     net.load_state_dict(torch.load(r"weights/best_model.pkl"))
+    net.eval()
     hits1 = 0
     hits5 = 0
     hits10 = 0
