@@ -2,3 +2,5 @@ dir_to_ignore/
 dataset
 .idea
 __pycache__
+pretrain
+weights

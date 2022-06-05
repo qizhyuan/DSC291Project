@@ -21,8 +21,8 @@ parser.add_argument('--epochs', '-e', type=check_positive, default=30)
 parser.add_argument('--batch_size', '-b', type=check_positive, default=64)
 parser.add_argument('--lr', '-l', type=float, help='learning rate', default=1e-3)
 parser.add_argument('--wd', '-w', type=float, help='weight decay(lambda)', default=1e-4)
-parser.add_argument('--n_factors', type=int, help="embedding size of autoencoder", default=200)
-parser.add_argument('--train_S', type=bool, help="Whether to train the source autoencoder", default=False)
+parser.add_argument('--n_factors', type=int, help="embedding size of autoencoder", default=2000)
+parser.add_argument('--train_S', type=bool, help="Whether to train the source autoencoder", default=True)
 args = parser.parse_args()
 
 train_dataset = Mydata(r'dataset\data_source.csv', r'dataset\data_target.csv', r'dataset\data_test.csv',
