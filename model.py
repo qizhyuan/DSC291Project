@@ -15,10 +15,10 @@ class DArec(nn.Module):
         self.T_n_users = args.T_n_users
         self.S_autorec = I_AutoRec(self.S_n_users, self.n_items, self.n_factors)
         self.T_autorec = I_AutoRec(self.T_n_users, self.n_items, self.n_factors)
-        # 加载预训练
+        # Load the pretrained weights of autoencoders
         self.S_autorec.load_state_dict(torch.load(args.S_pretrained_weights))
         self.T_autorec.load_state_dict(torch.load(args.T_pretrained_weights))
-        # 冻结预训练过的AutoRec参数
+        # Freeze the weights of autoencoders
         for para in self.S_autorec.parameters():
             para.requires_grad = False
         for para in self.T_autorec.parameters():
@@ -69,7 +69,7 @@ class DArec(nn.Module):
 
 
 if __name__ == "__main__":
-    # 行是item，列是user
+    # Items are rows, users are column
     parser = argparse.ArgumentParser()
     parser.add_argument("--n_factors", type=int, default=800, help="embedding dim")
     parser.add_argument("--n_users", type=int, default=50, help="size of each image batch")

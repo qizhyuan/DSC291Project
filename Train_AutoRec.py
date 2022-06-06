@@ -16,13 +16,24 @@ def check_positive(val):
     return val
 
 
+def str2bool(v):
+    if isinstance(v,bool):
+        return v
+    if v.lower() in ('yes','true','t','y','1'):
+        return True
+    elif v.lower() in ('no','false','f','n','0'):
+        return False
+    else:
+        raise argparse.ArgumentTypeError('Boolean value expected.')
+
+
 parser = argparse.ArgumentParser(description='AutoRec with PyTorch')
 parser.add_argument('--epochs', '-e', type=check_positive, default=30)
 parser.add_argument('--batch_size', '-b', type=check_positive, default=64)
 parser.add_argument('--lr', '-l', type=float, help='learning rate', default=1e-3)
 parser.add_argument('--wd', '-w', type=float, help='weight decay(lambda)', default=1e-4)
 parser.add_argument('--n_factors', type=int, help="embedding size of autoencoder", default=2000)
-parser.add_argument('--train_S', type=bool, help="Whether to train the source autoencoder", default=True)
+parser.add_argument('--train_S', type=str2bool, help="Whether to train the source autoencoder", default=True)
 args = parser.parse_args()
 
 train_dataset = Mydata(r'dataset\data_source.csv', r'dataset\data_target.csv', r'dataset\data_test.csv',

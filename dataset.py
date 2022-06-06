@@ -1,5 +1,4 @@
 from torch.utils.data import DataLoader, Dataset
-from collections import Counter
 import pandas as pd
 from tqdm import tqdm
 import numpy as np
@@ -30,33 +29,33 @@ class Mydata(Dataset):
             dict_S_users = {S_users[i]: i for i in range(len(S_users))}
             dict_T_users = {T_users[i]: i for i in range(len(T_users))}
             # Change code to id
-            # for index, row in tqdm(self.S_df.iterrows()):
-            #     self.S_df.iloc[index, 0] = dict_S_users[row["user"]]
-            #     self.S_df.iloc[index, 1] = dict_items[row["item"]]
-            # for index, row in tqdm(self.T_df.iterrows()):
-            #     item_idx = dict_items[row["item"]]
-            #     user_idx = dict_T_users[row["user"]]
-            #     self.T_df.iloc[index, 0] = user_idx
-            #     self.T_df.iloc[index, 1] = item_idx
-            # for index, row in tqdm(self.test_df.iterrows()):
-            #     item_idx = dict_items[row["item"]]
-            #     user_idx = dict_T_users[row["user"]]
-            #     self.test_df.iloc[index, 0] = user_idx
-            #     self.test_df.iloc[index, 1] = item_idx
+            for index, row in tqdm(self.S_df.iterrows()):
+                self.S_df.iloc[index, 0] = dict_S_users[row["user"]]
+                self.S_df.iloc[index, 1] = dict_items[row["item"]]
+            for index, row in tqdm(self.T_df.iterrows()):
+                item_idx = dict_items[row["item"]]
+                user_idx = dict_T_users[row["user"]]
+                self.T_df.iloc[index, 0] = user_idx
+                self.T_df.iloc[index, 1] = item_idx
+            for index, row in tqdm(self.test_df.iterrows()):
+                item_idx = dict_items[row["item"]]
+                user_idx = dict_T_users[row["user"]]
+                self.test_df.iloc[index, 0] = user_idx
+                self.test_df.iloc[index, 1] = item_idx
             # Save processed csv for calculating metrics
-            # 样例
+            # Example
             # Item    User    Rating
             # 22      32          5
-            # val_T_df.to_csv(self.T_path + ".val.processed.csv", index=False)
-            # self.S_df.to_csv(self.S_path + ".processed.csv", index=False)
-            # self.T_df.to_csv(self.T_path + ".processed.csv", index=False)
-            # self.test_df.to_csv(self.test_path + ".processed.csv", index=False)
+            val_T_df = self.T_df.iloc[-370:, :]
+            self.T_df = self.T_df.iloc[:-370, :]
+            val_T_df.to_csv(self.T_path + ".val.processed.csv", index=False)
+            self.S_df.to_csv(self.S_path + ".processed.csv", index=False)
+            self.T_df.to_csv(self.T_path + ".processed.csv", index=False)
+            self.test_df.to_csv(self.test_path + ".processed.csv", index=False)
             print(len(items))
             # 构建rating matrix
             self.S_df = pd.read_csv("dataset/data_source.csv.processed.csv")
             self.T_df = pd.read_csv("dataset/data_target.csv.processed.csv")
-            val_T_df = self.T_df.iloc[-370:, :]
-            self.T_df = self.T_df.iloc[:-370, :]
             self.S_data = torch.zeros((len(items), len(S_users)))
             self.T_data = torch.zeros((len(items), len(T_users)))
             for index, row in tqdm(self.S_df.iterrows()):

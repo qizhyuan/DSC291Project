@@ -48,11 +48,11 @@ class DArec_Loss(nn.Module):
 
     def forward(self, class_output, source_prediction, target_prediction, source_rating, target_rating, labels):
         """
-        :param class_output: Domain Classifier分类结果
-        :param source_prediction: Rating Predictor在Source Data上预测结果
-        :param target_prediction: Rating Predictor在Target Data上预测结果
-        :param source_rating: Source Data的GT
-        :param target_rating: Target Data的GT
+        :param class_output: result of the Domain Classifier
+        :param source_prediction: prediction of Rating Predictor on the source domain
+        :param target_prediction: prediction of Rating Predictor on the target domain
+        :param source_rating: Ground truth from source Data
+        :param target_rating: Ground truth from target Data
         :param labels: data class
         :return: Loss
         """
