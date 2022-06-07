@@ -81,4 +81,4 @@ Note that this branch does not contain the SOTA methods. For SOTA method, please
 |   EMCDR  | 0.2781 | 0.4364 |  0.4809 |  0.4999 |
 
 ## Visualization
-For convenience purpose, we stored and provided the detailed results of our experiments in result.json file. You may also run the main.py script to reduce the results. The visualization relies on the result.json file.  
+For convenience purpose, we stored and provided the detailed results of our experiments in result.json file. You may also run the main.py script to reduce the results. The visualization relies on the result.json file. The visualization code is presented in the notebook Visualization.ipynb. 
