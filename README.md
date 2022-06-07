@@ -79,3 +79,6 @@ Note that this branch does not contain the SOTA methods. For SOTA method, please
 |    MF    | 0.3762 | 0.5424 |  0.5828 |  0.5985 |
 | MF-Mixed | 0.3378 | 0.5125 |  0.5567 |  0.5733 |
 |   EMCDR  | 0.2781 | 0.4364 |  0.4809 |  0.4999 |
+
+## Visualization
+For convenience purpose, we stored and provided the detailed results of our experiments in result.json file. You may also run the main.py script to reduce the results. The visualization relies on the result.json file.  
