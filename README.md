@@ -44,7 +44,9 @@ Unzip the file dataset.rar at first. Then, use the following command to perform 
 
     python main.py
 
-The experimental results will be saved in the file result.json in the current dictionary.
+The experimental results will be saved in the file result.json in the current dictionary.  
+Note that this branch does not contain the SOTA methods. For SOTA method, please swith to the sota branch.
+
 
 ## Experimental Result
 ### MovieLens (S) -> Netflix Prize Data (T)
@@ -64,4 +66,19 @@ The experimental results will be saved in the file result.json in the current di
 | MF-Mixed | 0.1209 | 0.2793 |  0.3453 |  0.3746 |
 |   EMCDR  | 0.1570 | 0.3253 |  0.3775 |  0.3986 |
 
+### Netflix Prize Data (T) -> MovieLens (S) [Switch the Domain]
+|        Model       | Hits@1 | Hits@5 | Hits@10 | Hits@15 |
+|:------------------:|:------:|:------:|:-------:|:-------:|
+|    MF     | 0.3762 | 0.6911 |  0.8154 |  0.8745 |
+| MF-Mixed  | 0.3378 | 0.6689 |  0.8051 |  0.8676 |
+|   EMCDR   | 0.2781 | 0.5822 |  0.7194 |  0.7909 |
 
+
+|   Model  | NDCG@1 | NDCG@5 | NDCG@10 | NDCG@15 |
+|:--------:|:------:|:------:|:-------:|:-------:|
+|    MF    | 0.3762 | 0.5424 |  0.5828 |  0.5985 |
+| MF-Mixed | 0.3378 | 0.5125 |  0.5567 |  0.5733 |
+|   EMCDR  | 0.2781 | 0.4364 |  0.4809 |  0.4999 |
+
+## Visualization
+For convenience purpose, we stored and provided the detailed results of our experiments in result.json file. You may also run the main.py script to reduce the results. The visualization relies on the result.json file.  
