@@ -298,7 +298,7 @@ if __name__ == '__main__':
     source_model = TargetModel(user_num, item_num, emb_dim)
     source_model.load_source_embeddings(pretrain_path_t)
     source_model = source_model.to(device)
-    save_path = './emcdr_s2t.pkl'
+    save_path = './emcdr_t2s.pkl'
     optimizer_s = torch.optim.Adam(source_model.parameters(), lr=learning_rate, weight_decay=weight_decay)
 
     source_item_list = list(source_item_list)
