@@ -45,7 +45,7 @@ Unzip the file dataset.rar at first. Then, use the following command to perform 
     python main.py
 
 The experimental results will be saved in the file result.json in the current dictionary.  
-Note that this branch does not contain the SOTA methods. For SOTA method, please swith to the sota branch.
+**Note that this branch does not contain the SOTA methods. For SOTA method, please swith to the sota branch.**
 
 
 ## Experimental Result
