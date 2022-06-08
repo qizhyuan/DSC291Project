@@ -77,7 +77,7 @@ if __name__ == "__main__":
     train_rmse = []
     wdir = r"pretrain\\"
     model_name = r'S_AutoRec' if args.train_S else r'T_AutoRec'
-    min_loss = 999999999999
+    min_loss = float('inf')
     for epoch in tqdm(range(args.epochs)):
         train_loss = train(epoch)
         train_rmse.append(train_loss)
