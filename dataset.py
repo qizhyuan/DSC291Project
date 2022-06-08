@@ -73,9 +73,9 @@ class Mydata(Dataset):
         else:
             self.S_data = np.load(self.S_path + '.npy')
             self.T_data = np.load(self.T_path + '.npy')
-            self.S_df = pd.read_csv(self.S_path + ".processed.csv")
-            self.T_df = pd.read_csv(self.T_path + ".processed.csv")
-            self.test_df = pd.read_csv(self.test_path + ".processed.csv")
+            self.S_df = pd.read_csv("dataset/data_source_processed.csv")
+            self.T_df = pd.read_csv("dataset/data_target_processed.csv")
+            self.test_df = pd.read_csv("dataset/data_test_processed.csv")
         self.S_y = torch.zeros((self.S_data.shape[0], 1))
         self.T_y = torch.ones((self.T_data.shape[0], 1))
 

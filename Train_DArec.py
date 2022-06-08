@@ -25,14 +25,12 @@ parser.add_argument("--S_pretrained_weights", type=str, default=r'pretrain\S_Aut
 parser.add_argument("--T_pretrained_weights", type=str, default=r'pretrain\T_AutoRec.pkl')
 args = parser.parse_args()
 
-source_rating_matrix = np.load(r"dataset/data_source.csv.npy")
-target_rating_matrix = np.load(r"dataset/data_target.csv.npy")
-args.n_items = source_rating_matrix.shape[0]
-args.S_n_users = source_rating_matrix.shape[1]
-args.T_n_users = target_rating_matrix.shape[1]
-
 # Load Data
 dataset = Mydata(r'dataset\data_source.csv', r'dataset\data_target.csv', r'dataset\data_test.csv', preprocessed=True)
+
+args.n_items = dataset.S_data.shape[0]
+args.S_n_users = dataset.S_data.shape[1]
+args.T_n_users = dataset.T_data.shape[1]
 
 dataloader = DataLoader(dataset, batch_size=args.batch_size, shuffle=False)
 
