@@ -40,11 +40,14 @@ Average Item Degree: 153.74
 - scikit-learn
 
 ### Start
-Unzip the file dataset.rar at first. Then, use the following command to perform MF and EMCDR models.
+Unzip the file dataset.rar at first. Then, use the following command to run MF and EMCDR models.
 
     python main.py
 
 The experimental results will be saved in the file result.json in the current dictionary.  
+
+To run the baseline models, download the notebook BaselineCDR.ipynb and run all the code blocks. 
+
 **Note that this branch does not contain the SOTA methods. For SOTA method, please swith to the sota branch.**
 
 
@@ -66,7 +69,7 @@ The experimental results will be saved in the file result.json in the current di
 | MF-Mixed | 0.1209 | 0.2793 |  0.3453 |  0.3746 |
 |   EMCDR  | 0.1570 | 0.3253 |  0.3775 |  0.3986 |
 
-### Netflix Prize Data (T) -> MovieLens (S) [Switch the Domain]
+### Netflix Prize Data (T) -> MovieLens (S) [Switch the Source and Target Domain]
 |        Model       | Hits@1 | Hits@5 | Hits@10 | Hits@15 |
 |:------------------:|:------:|:------:|:-------:|:-------:|
 |    MF     | 0.3762 | 0.6911 |  0.8154 |  0.8745 |
@@ -82,3 +85,5 @@ The experimental results will be saved in the file result.json in the current di
 
 ## Visualization
 For convenience purpose, we stored and provided the detailed results of our experiments in result.json file. You may also run the main.py script to reduce the results. The visualization relies on the result.json file. The visualization code is presented in the notebook Visualization.ipynb. 
+
+For visualizing dataset statistics and results of baseline model, download and open the notebook BaselineCDR.ipynb, which contains the live demo of dataset statistics we listed above. Also, the baseline poplarity and Collabortive Filtering model is implemented at the end, running those code blocks will print the hit score of the baseline models. 
